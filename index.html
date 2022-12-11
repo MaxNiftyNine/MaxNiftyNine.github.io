@@ -1,64 +1,51 @@
 <html>
   <head>
-    <style>
-      canvas {
-        border: 1px solid black;
-      }
-    </style>
+    <title>Snake Game</title>
   </head>
   <body>
-    <canvas id="gameCanvas" width="500" height="500"></canvas>
+    <canvas id="gameCanvas" width="500" height="500" style="border:1px solid black;"></canvas>
     <script>
-      // Set up the canvas
-      var canvas = document.getElementById('gameCanvas');
-      var ctx = canvas.getContext('2d');
+      // Define the starting position of the snake
+      var snakeX = 250;
+      var snakeY = 250;
 
-      // Create the snake
-      var snake = [
-        {x: 150, y: 150},
-        {x: 140, y: 150},
-        {x: 130, y: 150},
-        {x: 120, y: 150},
-        {x: 110, y: 150},
-      ];
+      // Define the direction the snake is moving
+      var snakeDirection = "right";
 
-      // Create the food
-      var food = {
-        x: Math.floor(Math.random() * canvas.width),
-        y: Math.floor(Math.random() * canvas.height),
-      };
+      // Define the size of the snake and the size of the food
+      var snakeSize = 10;
+      var foodSize = 10;
 
-      // Set the initial direction of the snake
-      var dx = 10;
-      var dy = 0;
+      // Define the starting position of the food
+      var foodX = 50;
+      var foodY = 50;
 
-      // Set the initial speed of the snake
-      var speed = 100;
+      // Define the game loop
+      setInterval(draw, 100);
 
-      // Set up the game loop
-      function gameLoop() {
-        // Move the snake
-        var nx = snake[0].x + dx;
-        var ny = snake[0].y + dy;
-        snake.unshift({x: nx, y: ny});
+      // Define the draw() function
+      function draw() {
+        // Get a reference to the canvas element
+        var gameCanvas = document.getElementById("gameCanvas");
 
-        // Check if the snake has eaten the food
-        if (nx == food.x && ny == food.y) {
-          // Generate new food
-          food = {
-            x: Math.floor(Math.random() * canvas.width),
-            y: Math.floor(Math.random() * canvas.height),
-          };
-        } else {
-          // Remove the tail of the snake
-          snake.pop();
-        }
+        // Get a reference to the drawing context
+        var context = gameCanvas.getContext("2d");
 
         // Clear the canvas
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        context.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
 
-        // Draw the snake
-        for (var i = 0; i < snake.length; i++) {
-          var p = snake[i];
-          ctx.fillStyle = (i == 0) ? 'green' : 'white';
-          ctx.fillRect(p.x, p.y, 10, 10);
+        // Set the fill color of the food
+        context.fillStyle = "red";
+
+        // Draw the food at the specified position
+        context.fillRect(foodX, foodY, foodSize, foodSize);
+
+        // Set the fill color of the snake
+        context.fillStyle = "green";
+
+        // Draw the snake at the specified position
+        context.fillRect(snakeX, snakeY, snakeSize, snakeSize);
+      }
+    </script>
+  </body>
+</html>
