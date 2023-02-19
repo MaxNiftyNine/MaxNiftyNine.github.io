@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Contact Info</title>
+	<style>
+		#random-text {
+			position: absolute;
+			top: calc(50% - 50px);
+			left: calc(50% - 200px);
+			transform-origin: center;
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<img src="banner.PNG" alt="Banner Image" width="800" height="200">
+	</header>
+	<h1>Contact Information</h1>
+	<p>MaxNiftyNine</p>
+	<p>Email: max.katsnelson@icloud.com</p>
+	<div id="random-text">very good website yes indeed</div>
+	<script>
+		function updateTextPositionAndRotation() {
+			var randomText = document.getElementById("random-text");
+			randomText.style.top = Math.floor(Math.random() * 300) + "px";
+			randomText.style.left = Math.floor(Math.random() * 700) + "px";
+			randomText.style.transform = "rotate(" + (Math.floor(Math.random() * 180) - 90) + "deg)";
+		}
+		
+		// Update the text position and rotation every second
+		setInterval(updateTextPositionAndRotation, 1000);
+	</script>
+</body>
+</html>
