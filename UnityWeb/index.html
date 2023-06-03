@@ -112,7 +112,7 @@
         function hideGif() {
             liveReactionImg.style.display = 'none';
         }
-
+		container.addEventListener('mousemove', rotateText);
         dvd.addEventListener('mouseenter', showGif);
         dvd.addEventListener('mouseleave', hideGif);
 
@@ -163,6 +163,14 @@
             dirX = Math.round(Math.random()) * 2 - 1;
             dirY = Math.round(Math.random()) * 2 - 1;
         });
+		function rotateText(event) {
+			const x = (event.clientX / window.innerWidth - 0.5) * 40;
+			const y = (event.clientY / window.innerHeight - 0.5) * 60;
+
+			contactInfo.forEach(info => {
+				info.style.transform = `perspective(1000px) rotateX(${-y}deg) rotateY(${x}deg)`;
+			});
+		}
 
         window.requestAnimationFrame(animate);
     </script>
