@@ -61,7 +61,6 @@
 
         /* DVD Styles */
         #dvd {
-            display: block;
             position: absolute;
             top: 50%;
             left: 50%;
@@ -168,7 +167,8 @@
             const x = (event.clientX / window.innerWidth - 0.5) * 40;
             const y = (event.clientY / window.innerHeight - 0.5) * 60;
 
-            contactInfo.forEach(info => {
+            const contactInfo = document.getElementsByClassName('contact-info');
+            Array.from(contactInfo).forEach(info => {
                 info.style.transform = `perspective(1000px) rotateX(${-y}deg) rotateY(${x}deg)`;
             });
         }
