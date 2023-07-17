@@ -59,19 +59,6 @@
             animation: changeColor 5s linear infinite;
         }
 
-        /* Animation Styles */
-        @keyframes rotateText {
-            0% { transform: rotate(0deg); }
-            50% { transform: rotate(180deg); }
-            100% { transform: rotate(0deg); }
-        }
-
-        @keyframes changeColor {
-            0% { color: #00ff00; }
-            50% { color: #ff0000; }
-            100% { color: #00ff00; }
-        }
-
         /* DVD Styles */
         #dvd {
             position: absolute;
@@ -95,18 +82,15 @@
     </div>
     <div id="dvd">
         very good website yes indeed
-		<div id="live-reaction-gif">
-			<img id="live-reaction-img" src="LiveReaction.GIF" alt="Live Reaction GIF">
-		</div>
+        <div id="live-reaction-gif">
+            <img id="live-reaction-img" src="LiveReaction.GIF" alt="Live Reaction GIF">
+        </div>
     </div>
-    <button id="wiiu-exploit-btn" style="display: none;">Wii U Exploit</button>
-    
+
     <script>
         const container = document.querySelector('.container');
         const liveReactionImg = document.getElementById('live-reaction-img');
         const dvd = document.getElementById('dvd');
-        const wiiuExploitBtn = document.getElementById('wiiu-exploit-btn');
-        const userAgent = navigator.userAgent.toLowerCase();
 
         function showGif() {
             liveReactionImg.style.display = 'block';
@@ -115,7 +99,6 @@
         function hideGif() {
             liveReactionImg.style.display = 'none';
         }
-
         container.addEventListener('mousemove', rotateText);
         dvd.addEventListener('mouseenter', showGif);
         dvd.addEventListener('mouseleave', hideGif);
@@ -163,29 +146,33 @@
             window.requestAnimationFrame(animate);
         }
 
-        dvd.addEventListener("click", function() {
+        dvd.addEventListener("click", function () {
             dirX = Math.round(Math.random()) * 2 - 1;
             dirY = Math.round(Math.random()) * 2 - 1;
         });
-
         function rotateText(event) {
             const x = (event.clientX / window.innerWidth - 0.5) * 40;
             const y = (event.clientY / window.innerHeight - 0.5) * 60;
 
-            contactInfo.forEach(info => {
+            contactInfo.forEach((info) => {
                 info.style.transform = `perspective(1000px) rotateX(${-y}deg) rotateY(${x}deg)`;
             });
         }
 
-        if (userAgent.indexOf('wiiu') !== -1) {
-            wiiuExploitBtn.style.display = 'block';
-        }
-
-        wiiuExploitBtn.addEventListener('click', function() {
-            window.location.href = '/WiiU/Index.html';
-        });
-
         window.requestAnimationFrame(animate);
+    </script>
+
+    <br>
+    <center><img src="../images/55X_logo.png" alt="Logo"></center>
+    <br>
+    <center>
+        <a href="Exploit.html" id="element1" class="myButton" onClick="javascript:changeText(1)">Run Exploit!</a>
+    </center>
+    <script language="javascript">
+        function changeText(idElement) {
+            document.getElementById('element1').innerHTML =
+                '<a href="#">Loading.. <i class="fa fa-refresh fa-spin fa-fw"></i></a>';
+        }
     </script>
 </body>
 </html>
