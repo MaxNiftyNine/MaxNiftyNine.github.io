@@ -59,6 +59,19 @@
             animation: changeColor 5s linear infinite;
         }
 
+        /* Animation Styles */
+        @keyframes rotateText {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(180deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        @keyframes changeColor {
+            0% { color: #00ff00; }
+            50% { color: #ff0000; }
+            100% { color: #00ff00; }
+        }
+
         /* DVD Styles */
         #dvd {
             position: absolute;
@@ -71,18 +84,6 @@
             padding: 10px;
             z-index: 9999;
         }
-
-        /* WiiU Button Styles */
-        #wiiu-button {
-            display: none;
-            font-size: 18px;
-            background-color: #0073ff;
-            color: #ffffff;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
@@ -91,17 +92,21 @@
     </header>
     <div class="container">
         <h1 class="contact-info" id="title">MaxNiftyNine</h1>
-        <p id="user-agent"></p>
     </div>
-
-    <button id="wiiu-button">WiiU Exploit</button>
+    <div id="dvd">
+        very good website yes indeed
+		<div id="live-reaction-gif">
+			<img id="live-reaction-img" src="LiveReaction.GIF" alt="Live Reaction GIF">
+		</div>
+    </div>
+    <button id="wiiu-exploit-btn" style="display: none;">Wii U Exploit</button>
     
     <script>
         const container = document.querySelector('.container');
         const liveReactionImg = document.getElementById('live-reaction-img');
         const dvd = document.getElementById('dvd');
-        const wiiuButton = document.getElementById('wiiu-button');
-        const userAgentElement = document.getElementById('user-agent');
+        const wiiuExploitBtn = document.getElementById('wiiu-exploit-btn');
+        const userAgent = navigator.userAgent.toLowerCase();
 
         function showGif() {
             liveReactionImg.style.display = 'block';
@@ -167,23 +172,17 @@
             const x = (event.clientX / window.innerWidth - 0.5) * 40;
             const y = (event.clientY / window.innerHeight - 0.5) * 60;
 
-            const contactInfo = document.getElementsByClassName('contact-info');
-            Array.from(contactInfo).forEach(info => {
+            contactInfo.forEach(info => {
                 info.style.transform = `perspective(1000px) rotateX(${-y}deg) rotateY(${x}deg)`;
             });
         }
 
-        // Check user agent and display the WiiU button if it matches
-        const userAgent = navigator.userAgent;
-        userAgentElement.textContent = "User Agent: " + userAgent;
-        if (userAgent === "Mozilla/5.0 (Nintendo WiiU) AppleWebKit/536.30 (KHTML, like Gecko) NX/3.0.4.2.13 NintendoBrowser/4.3.2.11274.US") {
-            wiiuButton.style.display = 'block';
-            dvd.style.display = 'none';
+        if (userAgent.indexOf('wiiu') !== -1) {
+            wiiuExploitBtn.style.display = 'block';
         }
 
-        // Handle click event on the WiiU button
-        wiiuButton.addEventListener('click', function() {
-            window.location.href = "/WiiU/Index.html";
+        wiiuExploitBtn.addEventListener('click', function() {
+            window.location.href = '/WiiU/Index.html';
         });
 
         window.requestAnimationFrame(animate);
