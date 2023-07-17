@@ -61,6 +61,7 @@
 
         /* DVD Styles */
         #dvd {
+            display: block;
             position: absolute;
             top: 50%;
             left: 50%;
@@ -91,14 +92,9 @@
     </header>
     <div class="container">
         <h1 class="contact-info" id="title">MaxNiftyNine</h1>
+        <p id="user-agent"></p>
     </div>
-    <div id="dvd">
-        very good website yes indeed
-        <div id="live-reaction-gif">
-            <img id="live-reaction-img" src="LiveReaction.GIF" alt="Live Reaction GIF">
-        </div>
-    </div>
-    
+
     <button id="wiiu-button">WiiU Exploit</button>
     
     <script>
@@ -106,6 +102,7 @@
         const liveReactionImg = document.getElementById('live-reaction-img');
         const dvd = document.getElementById('dvd');
         const wiiuButton = document.getElementById('wiiu-button');
+        const userAgentElement = document.getElementById('user-agent');
 
         function showGif() {
             liveReactionImg.style.display = 'block';
@@ -178,8 +175,10 @@
 
         // Check user agent and display the WiiU button if it matches
         const userAgent = navigator.userAgent;
+        userAgentElement.textContent = "User Agent: " + userAgent;
         if (userAgent === "Mozilla/5.0 (Nintendo WiiU) AppleWebKit/536.30 (KHTML, like Gecko) NX/3.0.4.2.13 NintendoBrowser/4.3.2.11274.US") {
             wiiuButton.style.display = 'block';
+            dvd.style.display = 'none';
         }
 
         // Handle click event on the WiiU button
