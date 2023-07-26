@@ -1,0 +1,49 @@
+body {
+    background-color: #F5F5DC;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+    flex-direction: column;
+}
+
+#grid {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+#play, #stop {
+    padding: 10px 20px;
+    font-size: 1.2em;
+    margin: 5px;
+}
+
+#bpm {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 60px;
+    font-size: 1.2em;
+}
+
+.note-cell {
+    width: 30px;
+    height: 30px;
+    border: 1px solid black;
+    margin: 2px;
+}
+
+/* Different colors for each note */
+.note-cell.C5 { background-color: #1abc9c; }
+.note-cell.B4 { background-color: #2ecc71; }
+.note-cell.A4 { background-color: #3498db; }
+.note-cell.G4 { background-color: #9b59b6; }
+.note-cell.F4 { background-color: #34495e; }
+.note-cell.E4 { background-color: #f1c40f; }
+.note-cell.D4 { background-color: #e67e22; }
+.note-cell.C4 { background-color: #e74c3c; }
