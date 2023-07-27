@@ -71,6 +71,13 @@ button {
     right: 7.5%;
 }
 
+#loadDemo {
+    position: absolute;
+    bottom: 5%;
+    right: 7.5%;
+    width: 12.6%;
+}
+
 #exportMIDI {
     position: absolute;
     bottom: 10%;

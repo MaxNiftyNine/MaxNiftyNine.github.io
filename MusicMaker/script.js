@@ -194,7 +194,7 @@ exportButton.addEventListener("click", () => {
 });
 
 loadDemoButton.addEventListener("click", () => {
-    fetch('demo.json')
+    fetch('https://maxniftynine.github.io/MusicMaker/demo.json')
     .then(response => {
         if (!response.ok) {
             throw new Error("HTTP error " + response.status);
