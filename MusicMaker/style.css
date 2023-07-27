@@ -70,3 +70,9 @@ button {
     bottom: 10%;
     right: 7.5%;
 }
+
+#exportMIDI {
+    position: absolute;
+    bottom: 10%;
+    left: 7.5%;
+}

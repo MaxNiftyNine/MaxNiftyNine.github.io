@@ -18,7 +18,8 @@ const grid = document.querySelector("#grid");
 const synth = new Tone.Synth().toDestination();
 const bpmInput = document.querySelector("#bpm");
 const playButton = document.querySelector("#play");
-
+const exportButton = document.querySelector("#exportMIDI");
+const loadDemoButton = document.querySelector("#loadDemo");
 const saveButton = document.querySelector("#save");
 const loadButton = document.querySelector("#loadButton");
 const loadInput = document.querySelector("#load");
@@ -161,3 +162,54 @@ function updateDisplay() {
         }
     }
 }
+
+exportButton.addEventListener("click", () => {
+    // Create an instance of MidiWriterJS
+    let track = new MidiWriter.Track();
+
+    // Convert the sequence to MIDI events
+    sequence.forEach(noteIndex => {
+        if (notes[noteIndex] !== "OFF") {
+            // MidiWriterJS needs MIDI note numbers, so we convert from note names
+            let noteNumber = MidiWriter.Utils.getPitch(notes[noteIndex]);
+
+            // Create a note event and add it to the track
+            let note = new MidiWriter.NoteEvent({pitch: [noteNumber], duration: '16'});
+            track.addEvent(note);
+        } else {
+            // If the note is "OFF", add a rest
+            let rest = new MidiWriter.NoteEvent({rest: true, duration: '16'});
+            track.addEvent(rest);
+        }
+    });
+
+    // Generate the MIDI file
+    let write = new MidiWriter.Writer([track]);
+
+    // Create a link to download the MIDI file
+    let a = document.createElement('a');
+    a.href = "data:audio/midi;base64," + write.base64();
+    a.download = 'sequence.mid';
+    a.click();
+});
+
+loadDemoButton.addEventListener("click", () => {
+    fetch('demo.json')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("HTTP error " + response.status);
+        }
+        return response.json();
+    })
+    .then(json => {
+        if (Array.isArray(json) && json.length === sequence.length) {
+            sequence = json.map(note => notes.indexOf(note));
+            updateDisplay();
+        } else {
+            alert("Invalid demo file");
+        }
+    })
+    .catch(function() {
+        alert("Failed to load demo");
+    });
+});
