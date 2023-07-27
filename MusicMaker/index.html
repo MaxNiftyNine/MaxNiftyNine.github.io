@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <link rel="stylesheet" type="text/css" href="styles.css">
-</head>
-<body>
-  <div id="grid"></div>
-  <input id="bpm" type="number" value="120">
-  <button id="play">Play</button>
-  <button id="stop">Stop</button>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.30/Tone.js"></script>
-  <script src="musicMaker.js"></script>
-</body>
+    <head>
+        <title>Music Maker</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div id="grid"></div>
+        <div id="bpmContainer">
+            BPM: <input id="bpm" type="number" value="120">
+        </div>
+        <button id="play">Play</button>
+        <button id="save">Save</button>
+        <button id="loadButton">Load</button>
+        <input id="load" type="file" style="display: none;">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.36/Tone.js"></script>
+        <script src="script.js"></script>
+    </body>
 </html>
