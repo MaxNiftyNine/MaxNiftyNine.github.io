@@ -1,0 +1,30 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    background-color: black;
+    color: white;
+    margin: 0;
+}
+
+#content {
+    text-align: center;
+}
+
+#retry {
+    display: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin-top: 20px;
+    background-color: #fff;
+    color: #000;
+    border: none;
+    border-radius: 5px;
+}
+
+#time-display {
+    font-size: 128px;
+}
