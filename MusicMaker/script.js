@@ -102,18 +102,31 @@ for (let row = 0; row < 2; row++) {
 playButton.addEventListener("click", () => {
     Tone.Transport.bpm.value = bpmInput.value;
     let i = 0;
+    const gridCells = document.querySelectorAll('.note-cell');
+    const highlightNote = (index) => {
+        gridCells.forEach((cell, cellIndex) => {
+            if (cellIndex === index) {
+                cell.style.borderColor = 'red'; // Highlight current note
+            } else {
+                cell.style.borderColor = '#000000'; // Reset other notes
+            }
+        });
+    };
     const scheduledSequence = Tone.Transport.scheduleRepeat((time) => {
         if (sequence[i] !== 0) {
             synth.triggerAttackRelease(notes[sequence[i]], "8n", time);
+            highlightNote(i);
         }
         i++;
         if (i >= sequence.length) {
             Tone.Transport.clear(scheduledSequence);
             i = 0; // Optional, reset i for next time play is pressed
+            gridCells.forEach(cell => cell.style.borderColor = '#000000'); // Reset all after playing
         }
     }, "16n");
     Tone.Transport.start();
 });
+
 
 
 
