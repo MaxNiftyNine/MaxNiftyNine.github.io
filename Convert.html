@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PNG to GIF Converter</title>
+</head>
+<body>
+    <h1>PNG to GIF Converter</h1>
+    <input type="file" id="pngInput" accept="image/png" />
+    <button id="convertBtn">Convert to GIF</button>
+    <div id="output">
+        <h3>Output GIF:</h3>
+        <img id="gifOutput" src="" alt="GIF will appear here">
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/gif.js/dist/gif.js"></script>
+    <script>
+        document.getElementById('convertBtn').addEventListener('click', function() {
+            const input = document.getElementById('pngInput');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = function() {
+                        const gif = new GIF({
+                            workers: 2,
+                            quality: 10
+                        });
+
+                        gif.addFrame(img, {delay: 200});
+                        gif.on('finished', function(blob) {
+                            const gifURL = URL.createObjectURL(blob);
+                            document.getElementById('gifOutput').src = gifURL;
+                        });
+
+                        gif.render();
+                    }
+                };
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                alert("Please select a PNG file.");
+            }
+        });
+    </script>
+</body>
+</html>
