@@ -8,7 +8,6 @@
   </head>
   <body>
     <div id="app" tabindex="0" aria-label="Typing game">
-      <!-- HUD -->
       <div class="hud">
         <div id="status" class="status"></div>
         <div class="modes">
@@ -17,12 +16,8 @@
         </div>
       </div>
 
-      <!-- Center stack -->
-      <div class="center" id="centerStack">
-        <div class="best">
-          Best: <span id="bestValue" class="mono">—</span>
-        </div>
-
+      <div class="center">
+        <div class="best">Best: <span id="bestValue" class="mono">—</span></div>
         <div id="timer" class="timer mono">00:00.000</div>
 
         <div class="typedWrap">
@@ -30,7 +25,7 @@
         </div>
 
         <div id="score" class="score mono"></div>
-        <div id="scoreHint" class="scoreHint"> </div>
+        <div id="scoreHint" class="scoreHint"></div>
       </div>
     </div>
 
