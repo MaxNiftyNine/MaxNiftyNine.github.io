@@ -13,7 +13,6 @@
   const btnAlphabet = document.getElementById("btnAlphabet");
   const btnFox = document.getElementById("btnFox");
 
-  /** state */
   let mode = "alphabet"; // "alphabet" | "fox"
   let phase = "idle";    // "idle" | "running" | "error" | "success"
   let typed = "";
@@ -26,16 +25,14 @@
   let lockUntil = 0;
   let resetting = false;
 
-  // timing
   const lockMs = 1200;
   const deleteWindowSec = 0.6;
 
-  // caret flash
   let caretOn = true;
   let caretTimer = null;
 
-  // raf for timer
   let raf = null;
+  const timeouts = [];
 
   function getTarget() {
     return mode === "alphabet" ? ALPHABET_TARGET : FOX_TARGET;
@@ -73,7 +70,6 @@
   }
 
   function normalizedChar(key) {
-    // allow letters and space
     if (!key || key.length !== 1) return "";
     if (key === " ") return " ";
     const lower = key.toLowerCase();
@@ -93,23 +89,12 @@
     return 0;
   }
 
-  function setPhase(next) {
-    phase = next;
-    render();
+  function clearTimeouts() {
+    while (timeouts.length) clearTimeout(timeouts.pop());
   }
 
-  function resetAll() {
-    typed = "";
-    startTs = null;
-    endElapsed = 0;
-    frozenElapsed = 0;
-    errorIndex = null;
-    errorChar = "";
-    lockUntil = 0;
-    resetting = false;
-    setPhase("idle");
-    stopTimerRAF();
-    render();
+  function renderTimer() {
+    timerEl.textContent = formatMs(elapsedNow());
   }
 
   function startTimerRAF() {
@@ -139,6 +124,21 @@
     caretTimer = null;
   }
 
+  function hardReset() {
+    clearTimeouts();
+    typed = "";
+    phase = "idle";
+    startTs = null;
+    endElapsed = 0;
+    frozenElapsed = 0;
+    errorIndex = null;
+    errorChar = "";
+    lockUntil = 0;
+    resetting = false;
+    stopTimerRAF();
+    render();
+  }
+
   function startRunIfNeeded(rawKey) {
     const target = getTarget();
     const firstExpected = target[0];
@@ -152,7 +152,7 @@
     errorIndex = null;
     errorChar = "";
     resetting = false;
-    setPhase("running");
+    phase = "running";
     startTimerRAF();
     render();
     return true;
@@ -160,121 +160,49 @@
 
   function handleSuccess(finalMs) {
     endElapsed = finalMs;
-    setPhase("success");
+    phase = "success";
     saveBestIfNeeded(finalMs);
     stopTimerRAF();
     render();
   }
 
-  function beginError(wrongRaw) {
-    // freeze time
-    frozenElapsed = startTs != null ? Date.now() - startTs : elapsedNow();
-
-    errorIndex = typed.length;
-    errorChar = wrongRaw;
-    setPhase("error");
-
-    lockUntil = Date.now() + lockMs;
-
-    // schedule delete animation near end
-    resetting = false;
-    const deleteMs = Math.round(deleteWindowSec * 1000);
-
-    setTimeout(() => {
-      resetting = true;
-      runDeleteAnimation();
-      updateCaretOnly();
-    }, Math.max(0, lockMs - deleteMs));
-
-    setTimeout(() => {
-      resetAll();
-    }, lockMs);
-
-    stopTimerRAF(); // timer stays frozen on fail
-    render();
-  }
-
   function runDeleteAnimation() {
-    // Add .del one by one from end -> start across deleteWindowSec
     const spans = typedEl.querySelectorAll(".char");
     const total = spans.length;
     if (!total) return;
 
     const step = (deleteWindowSec * 1000) / total;
-
     for (let i = total - 1; i >= 0; i--) {
       const delay = (total - 1 - i) * step;
-      setTimeout(() => {
-        spans[i].classList.add("del");
-      }, delay);
+      timeouts.push(setTimeout(() => spans[i].classList.add("del"), delay));
     }
   }
 
-  function renderTimer() {
-    timerEl.textContent = formatMs(elapsedNow());
-  }
+  function beginError(wrongRaw) {
+    frozenElapsed = startTs != null ? Date.now() - startTs : elapsedNow();
 
-  function render() {
-    // background
-    app.classList.toggle("error", phase === "error");
-    
-    // best
-    const b = bestMs();
-    bestEl.textContent = b != null ? formatMs(b) : "—";
+    errorIndex = typed.length;
+    errorChar = wrongRaw;
+    phase = "error";
 
-    // timer always visible
-    renderTimer();
+    lockUntil = Date.now() + lockMs;
+    stopTimerRAF();
 
-    // typed display letter spacing per mode
-    typedEl.style.letterSpacing = mode === "alphabet" ? "0.08em" : "0.04em";
+    resetting = false;
+    clearTimeouts();
 
-    // score
-    if (phase === "success") {
-      const bestStr = (bestMs() != null) ? formatMs(bestMs()) : "—";
-      scoreEl.textContent = `TIME ${formatMs(endElapsed)}   •   BEST ${bestStr}`;
-      scoreHintEl.textContent = `Type ${getTarget()[0]} to run again.`;
-    } else {
-      scoreEl.textContent = "";
-      scoreHintEl.textContent = " ";
-    }
+    const deleteMs = Math.round(deleteWindowSec * 1000);
+    timeouts.push(setTimeout(() => {
+      resetting = true;
+      runDeleteAnimation();
+      updateCaretOnly();
+    }, Math.max(0, lockMs - deleteMs)));
 
-    // render characters (for error, append wrong char)
-    const renderLetters = (phase === "error") ? (typed + errorChar) : typed;
+    timeouts.push(setTimeout(() => {
+      hardReset();
+    }, lockMs));
 
-    typedEl.innerHTML = "";
-
-    for (let i = 0; i < renderLetters.length; i++) {
-      const c = renderLetters[i];
-      const span = document.createElement("span");
-      span.className = "char";
-      const isWrong = phase === "error" && errorIndex === i;
-      if (isWrong) span.classList.add("wrong");
-
-      // display char:
-      // - alphabet mode: uppercase
-      // - spaces: show ·
-      let out = c;
-      if (c === " ") out = "·";
-      else if (mode === "alphabet") out = c.toUpperCase();
-
-      span.textContent = out;
-      typedEl.appendChild(span);
-    }
-
-    // caret (single caret node)
-    ensureCaretNode();
-    updateCaretOnly();
-
-    // mode buttons
-    btnAlphabet.classList.toggle("active", mode === "alphabet");
-    btnFox.classList.toggle("active", mode === "fox");
-
-    // caret timer
-    if (phase === "success") {
-      stopCaret();
-    } else {
-      startCaret();
-    }
+    render();
   }
 
   function ensureCaretNode() {
@@ -292,23 +220,90 @@
     caret.classList.toggle("dim", phase === "idle");
     caret.classList.toggle("off", !caretOn);
 
-    const deleting = resetting;
-    caret.classList.toggle("deleting", deleting);
+    caret.classList.toggle("deleting", resetting);
 
-    if (phase === "success") {
-      caret.style.display = "none";
-    } else {
-      caret.style.display = "inline-block";
-    }
+    if (phase === "success") caret.style.display = "none";
+    else caret.style.display = "inline-block";
   }
 
-  // Events
-  app.addEventListener("pointerdown", () => {
-    app.focus();
+  function render() {
+    app.classList.toggle("error", phase === "error");
+    
+    const b = bestMs();
+    bestEl.textContent = b != null ? formatMs(b) : "—";
+
+    renderTimer();
+
+    // letter spacing per mode
+    typedEl.style.letterSpacing = mode === "alphabet" ? "0.08em" : "0.04em";
+
+    if (phase === "success") {
+      const bestStr = (bestMs() != null) ? formatMs(bestMs()) : "—";
+      scoreEl.textContent = `TIME ${formatMs(endElapsed)}   •   BEST ${bestStr}`;
+      scoreHintEl.textContent = `Type ${getTarget()[0]} to run again.`;
+    } else {
+      scoreEl.textContent = "";
+      scoreHintEl.textContent = "";
+    }
+
+    const renderLetters = (phase === "error") ? (typed + errorChar) : typed;
+
+    typedEl.innerHTML = "";
+    for (let i = 0; i < renderLetters.length; i++) {
+      const c = renderLetters[i];
+      const span = document.createElement("span");
+      span.className = "char";
+      if (phase === "error" && errorIndex === i) span.classList.add("wrong");
+
+      let out = c;
+      if (c === " ") out = "·";
+      else if (mode === "alphabet") out = c.toUpperCase();
+
+      span.textContent = out;
+      typedEl.appendChild(span);
+    }
+
+    ensureCaretNode();
+    updateCaretOnly();
+
+    btnAlphabet.classList.toggle("active", mode === "alphabet");
+    btnFox.classList.toggle("active", mode === "fox");
+
+    if (phase === "success") stopCaret();
+    else startCaret();
+  }
+
+  // Focus helper
+  app.addEventListener("pointerdown", () => app.focus());
+
+  // Mode buttons
+  [btnAlphabet, btnFox].forEach((btn) => btn.addEventListener("pointerdown", (e) => e.stopPropagation()));
+
+  btnAlphabet.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (mode === "alphabet") return;
+    mode = "alphabet";
+    hardReset();
+    render();
+  });
+
+  btnFox.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (mode === "fox") return;
+    mode = "fox";
+    hardReset();
+    render();
   });
 
   document.addEventListener("keydown", (e) => {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+    // Backspace: reset everything any time (timer -> 0, typed -> empty)
+    if (e.key === "Backspace") {
+      e.preventDefault();
+      hardReset();
+      return;
+    }
 
     const raw = e.key;
     const norm = normalizedChar(raw);
@@ -335,7 +330,6 @@
       return;
     }
 
-    // append expected char (preserve target casing/spaces)
     typed += expected;
     render();
 
@@ -343,26 +337,6 @@
       const final = Date.now() - (startTs ?? Date.now());
       handleSuccess(final);
     }
-  });
-
-  // Mode buttons (stop propagation so app pointerdown doesn't interfere)
-  btnAlphabet.addEventListener("pointerdown", (e) => e.stopPropagation());
-  btnFox.addEventListener("pointerdown", (e) => e.stopPropagation());
-
-  btnAlphabet.addEventListener("click", (e) => {
-    e.stopPropagation();
-    if (mode === "alphabet") return;
-    mode = "alphabet";
-    resetAll();
-    render();
-  });
-
-  btnFox.addEventListener("click", (e) => {
-    e.stopPropagation();
-    if (mode === "fox") return;
-    mode = "fox";
-    resetAll();
-    render();
   });
 
   // init
