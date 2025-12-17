@@ -3,27 +3,52 @@ const timeDisplay = document.getElementById('time-display');
 const retryButton = document.getElementById('retry');
 
 let startTime;
+let gameReady = false;
+let timeoutId;
 
 function startGame() {
-    let randomTime = Math.random() * (10000 - 3000) + 3000;  
-    setTimeout(turnGreen, randomTime);
+    gameReady = false;
+    document.body.style.backgroundColor = '#fff';
+    timeDisplay.textContent = 'Wait for green...';
+    retryButton.style.display = 'none';
+
+    document.body.addEventListener('click', handleClick);
+
+    const randomTime = Math.random() * (10000 - 3000) + 3000;
+    timeoutId = setTimeout(turnGreen, randomTime);
 }
 
 function turnGreen() {
-    document.body.style.backgroundColor = '#4CAF50';  
+    gameReady = true;
+    document.body.style.backgroundColor = '#4CAF50';
     timeDisplay.textContent = '';
-    startTime = new Date().getTime();  
-    document.body.addEventListener('click', checkTime);
+    startTime = Date.now();
+}
+
+function handleClick() {
+    if (!gameReady) {
+        loseGame();
+    } else {
+        checkTime();
+    }
 }
 
 function checkTime() {
-    const endTime = new Date().getTime();
-    const reactionTime = (endTime - startTime) / 1000;  
+    const reactionTime = (Date.now() - startTime) / 1000;
+    timeDisplay.textContent = `Reaction time: ${reactionTime.toFixed(2)}s`;
+    endGame();
+}
 
-    timeDisplay.textContent = reactionTime.toFixed(2);
+function loseGame() {
+    clearTimeout(timeoutId);
+    timeDisplay.textContent = 'Too early! You lose 😬';
+    document.body.style.backgroundColor = '#f44336';
+    endGame();
+}
+
+function endGame() {
+    document.body.removeEventListener('click', handleClick);
     retryButton.style.display = 'block';
-
-    document.body.removeEventListener('click', checkTime);
 }
 
 startGame();
