@@ -1,357 +1,171 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Piano</title>
-  <style>
-  /* Minimal layout: keep piano and controls together, no extra styling */
-  body { font-family: system-ui, sans-serif; margin: 12px; }
-  .app { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-start; }
-  .card { border: 1px solid #ccc; padding: 10px; }
-  .pianoWrap { padding: 10px; }
-  .piano { position: relative; width: 760px; max-width: 100%; height: 220px; border: 1px solid #333; }
-  .white { position: absolute; top: 0; height: 100%; background: #fff; border-right: 1px solid #333; }
-  .white.down { background: #ddd; }
-  .black { position: absolute; top: 0; height: 60%; background: #000; z-index: 2; }
-  .black.down { background: #444; }
-  .row { display: flex; gap: 10px; flex-wrap: wrap; }
-  .field { margin: 6px 0; }
-  .field label { display: block; font-size: 12px; }
-  .btnrow { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
-  .kbd { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-  .kbd span { border: 1px solid #ccc; padding: 2px 6px; font-size: 12px; }
-  .pill { display: inline-block; border: 1px solid #ccc; padding: 2px 6px; font-size: 12px; }
+<meta charset="UTF-8">
+<title>Simple Piano</title>
+<style>
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #2a2a2a;
+    font-family: sans-serif;
+  }
+  .piano {
+    position: relative;
+    display: flex;
+    background: #111;
+    padding: 12px 26px 12px 12px;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.5);
+  }
+  .white {
+    width: 56px;
+    height: 220px;
+    background: #fafafa;
+    border: 1px solid #999;
+    border-radius: 0 0 6px 6px;
+    margin: 0 1px;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    padding-bottom: 10px;
+    color: #555;
+    cursor: pointer;
+    user-select: none;
+    transition: background .05s;
+    font-size: 14px;
+  }
+  .white.active { background: #cfe9ff; }
+  .black {
+    position: absolute;
+    width: 36px;
+    height: 130px;
+    background: #222;
+    border-radius: 0 0 4px 4px;
+    color: #ccc;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    padding-bottom: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    user-select: none;
+    z-index: 2;
+    top: 12px;
+    transition: background .05s;
+  }
+  .black.active { background: #4a7fa8; }
 </style>
 </head>
 <body>
-  <div class="app">
-    <div class="card">
-      <div class="header">
-        <div>
-          <h1>Piano</h1>
-          
-        </div>
-      </div>
-      <div class="pianoWrap">
-        <div class="piano" id="piano" aria-label="piano"></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="header">
-        <div>
-          <h1>Controls</h1>
-          <p class="sub">Audio starts after you click “Enable Audio”.</p>
-        </div>
-        <div class="pill" id="octPill">oct 0</div>
-      </div>
-      <div class="content">
-        <div class="row">
-          <div class="field">
-            <label for="wave">Waveform</label>
-            <select id="wave">
-              <option value="sine">sine</option>
-              <option value="triangle">triangle</option>
-              <option value="sawtooth">sawtooth</option>
-              <option value="square">square</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="gain">Volume</label>
-            <input id="gain" type="range" min="0" max="1" step="0.01" value="0.25" />
-          </div>
-        </div>
-
-        <div class="row" style="margin-top:10px;">
-          <div class="field">
-            <label for="attack">Attack (ms)</label>
-            <input id="attack" type="range" min="0" max="120" step="1" value="10" />
-          </div>
-          <div class="field">
-            <label for="release">Release (ms)</label>
-            <input id="release" type="range" min="10" max="800" step="5" value="180" />
-          </div>
-        </div>
-
-        <div class="field" style="margin-top:10px;">
-          <label for="scheme">Keyboard scheme</label>
-          <select id="scheme">
-            <option value="octave" selected>asdf… mode (white/black + z/x)</option>
-            <option value="full">123… long mapping</option>
-          </select>
-        </div>
-
-        <div class="btnrow">
-          <div class="btn" id="enableAudio">Enable Audio</div>
-          <div class="btn secondary" id="panic">Panic (all notes off)</div>
-        </div>
-
-        <div class="kbd" id="kbdHint"></div>
-      </div>
-    </div>
-  </div>
-
+<div class="piano" id="piano"></div>
 <script>
-  // Helpers
-  function midiToFreq(midi){return 440*Math.pow(2,(midi-69)/12)}
-  function isBlack(midi){const pc=midi%12;return pc===1||pc===3||pc===6||pc===8||pc===10}
-  function noteName(midi){
-    const names=["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"]
-    const o=Math.floor(midi/12)-1
-    return names[midi%12]+String(o)
-  }
-  function stripDigits(s){let out="";for(let i=0;i<s.length;i++){const c=s[i];if(c<"0"||c>"9") out+=c}return out}
+  const keys = [
+    { key: 'a',  freq: 261.63, type: 'white' }, // C4
+    { key: 'w',  freq: 277.18, type: 'black' }, // C#4
+    { key: 's',  freq: 293.66, type: 'white' }, // D4
+    { key: 'e',  freq: 311.13, type: 'black' }, // D#4
+    { key: 'd',  freq: 329.63, type: 'white' }, // E4
+    { key: 'f',  freq: 349.23, type: 'white' }, // F4
+    { key: 't',  freq: 369.99, type: 'black' }, // F#4
+    { key: 'g',  freq: 392.00, type: 'white' }, // G4
+    { key: 'y',  freq: 415.30, type: 'black' }, // G#4
+    { key: 'h',  freq: 440.00, type: 'white' }, // A4
+    { key: 'u',  freq: 466.16, type: 'black' }, // A#4
+    { key: 'j',  freq: 493.88, type: 'white' }, // B4
+    { key: 'k',  freq: 523.25, type: 'white' }, // C5
+    { key: 'o',  freq: 554.37, type: 'black' }, // C#5
+    { key: 'l',  freq: 587.33, type: 'white' }, // D5
+    { key: 'p',  freq: 622.25, type: 'black' }, // D#5
+    { key: ';',  freq: 659.25, type: 'white' }, // E5
+    { key: "'",  freq: 698.46, type: 'white' }, // F5
+    { key: ']',  freq: 739.99, type: 'black' }  // F#5
+  ];
 
-  // Audio
-  let audioCtx=null
-  let masterGain=null
-  const voices=new Map()
+  const piano = document.getElementById('piano');
+  const elements = {};
+  const WHITE_W = 58; // 56 width + 2 (1px margin each side)
+  const PAD = 12;
 
-  function ensureAudio(){
-    if(audioCtx) return
-    audioCtx=new (window.AudioContext||window.webkitAudioContext)()
-    masterGain=audioCtx.createGain()
-    masterGain.gain.value=parseFloat(document.getElementById("gain").value)
-    masterGain.connect(audioCtx.destination)
-  }
-
-  function noteOn(note,velocity,waveform){
-    if(!audioCtx) return
-    if(voices.has(note)) return
-
-    const osc=audioCtx.createOscillator()
-    const g=audioCtx.createGain()
-    const now=audioCtx.currentTime
-
-    const attackMs=parseFloat(document.getElementById("attack").value)
-    const target=Math.max(0,Math.min(1,velocity))*0.9
-
-    osc.type=waveform||document.getElementById("wave").value
-    osc.frequency.value=midiToFreq(note)
-
-    g.gain.setValueAtTime(0.0001,now)
-    g.gain.exponentialRampToValueAtTime(Math.max(0.0001,target),now+attackMs/1000)
-
-    osc.connect(g)
-    g.connect(masterGain)
-    osc.start(now)
-
-    voices.set(note,{osc,gain:g})
-  }
-
-  function noteOff(note){
-    if(!audioCtx) return
-    const v=voices.get(note)
-    if(!v) return
-
-    const now=audioCtx.currentTime
-    const releaseMs=parseFloat(document.getElementById("release").value)
-
-    v.gain.gain.cancelScheduledValues(now)
-    v.gain.gain.setValueAtTime(Math.max(0.0001,v.gain.gain.value),now)
-    v.gain.gain.exponentialRampToValueAtTime(0.0001,now+releaseMs/1000)
-
-    v.osc.stop(now+releaseMs/1000+0.02)
-    voices.delete(note)
-  }
-
-  function allNotesOff(){for(const n of Array.from(voices.keys())) noteOff(n)}
-
-  document.getElementById("gain").addEventListener("input",()=>{if(masterGain) masterGain.gain.value=parseFloat(document.getElementById("gain").value)})
-  document.getElementById("enableAudio").addEventListener("click",async()=>{ensureAudio(); if(audioCtx.state==="suspended") await audioCtx.resume()})
-  document.getElementById("panic").addEventListener("click",()=>{allNotesOff(); for(const el of document.querySelectorAll(".white.down,.black.down")) el.classList.remove("down")})
-
-  // Visual piano
-  const piano=document.getElementById("piano")
-  const startMidi=60
-  const endMidi=84
-  const whites=[]
-  for(let n=startMidi;n<=endMidi;n++){if(!isBlack(n)) whites.push(n)}
-
-  function buildKeys(){
-    piano.innerHTML=""
-    const whiteCount=whites.length
-    const W=100/whiteCount
-
-    for(let i=0;i<whites.length;i++){
-      const midi=whites[i]
-      const el=document.createElement("div")
-      el.className="white"
-      el.dataset.note=String(midi)
-      el.style.left=String(i*W)+"%"
-      el.style.width=String(W)+"%"
-      el.textContent=""
-      piano.appendChild(el)
+  // Pass 1: render white keys in order
+  let whiteIdx = 0;
+  keys.forEach(k => {
+    if (k.type === 'white') {
+      const el = document.createElement('div');
+      el.className = 'white';
+      el.textContent = k.key;
+      piano.appendChild(el);
+      elements[k.key] = el;
+      k._whiteIdx = whiteIdx++;
     }
+  });
 
-    const blackWidth=W*0.62
-    const blackLeftOffset=W-blackWidth/2
-
-    for(let n=startMidi;n<=endMidi;n++){
-      if(!isBlack(n)) continue
-      let prev=n-1
-      while(prev>=startMidi && isBlack(prev)) prev--
-      const prevIdx=whites.indexOf(prev)
-      if(prevIdx<0) continue
-
-      const el=document.createElement("div")
-      el.className="black"
-      el.dataset.note=String(n)
-      el.style.left=String(prevIdx*W+blackLeftOffset)+"%"
-      el.style.width=String(blackWidth)+"%"
-      el.textContent="#"
-      piano.appendChild(el)
+  // Pass 2: position black keys absolutely over the gaps between whites
+  let lastWhite = -1;
+  keys.forEach(k => {
+    if (k.type === 'white') {
+      lastWhite = k._whiteIdx;
+    } else {
+      const el = document.createElement('div');
+      el.className = 'black';
+      el.textContent = k.key;
+      el.style.left = (PAD + (lastWhite + 1) * WHITE_W - 18) + 'px';
+      piano.appendChild(el);
+      elements[k.key] = el;
     }
+  });
+
+  // Web Audio
+  let ctx;
+  const active = {};
+
+  function playNote(key) {
+    const k = keys.find(x => x.key === key);
+    if (!k || active[key]) return;
+    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.value = k.freq;
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.25, ctx.currentTime + 0.01);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start();
+    active[key] = { osc, gain };
+    elements[key].classList.add('active');
   }
 
-  buildKeys()
-  window.addEventListener("resize",buildKeys)
-
-  function setKeyVisual(note,state){
-    const el=piano.querySelector('[data-note="'+String(note)+'"]')
-    if(!el) return
-    if(state) el.classList.add("down")
-    else el.classList.remove("down")
+  function stopNote(key) {
+    if (!active[key]) return;
+    const { osc, gain } = active[key];
+    gain.gain.cancelScheduledValues(ctx.currentTime);
+    gain.gain.setValueAtTime(gain.gain.value, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.15);
+    osc.stop(ctx.currentTime + 0.16);
+    delete active[key];
+    elements[key].classList.remove('active');
   }
 
-  // Keyboard schemes
-  const schemeEl=document.getElementById("scheme")
-  const kbdHint=document.getElementById("kbdHint")
-  const octPill=document.getElementById("octPill")
+  document.addEventListener('keydown', e => {
+    if (e.repeat) return;
+    const k = e.key.toLowerCase();
+    if (elements[k]) { e.preventDefault(); playNote(k); }
+  });
+  document.addEventListener('keyup', e => {
+    const k = e.key.toLowerCase();
+    if (elements[k]) stopNote(k);
+  });
 
-  const BASE_MIDI=60
-  let octaveShift=0
-
-  const WHITE_KEYS=["a","s","d","f","g","h","j","k","l",";","'"]
-  const BLACK_KEYS=["w","e","t","u","o","p","]"]
-
-  const WHITE_OFFSETS=[0,2,4,5,7,9,11,12,14,16,17]
-  const BLACK_OFFSETS=[1,3,6,8,10,13,18]
-
-  const FULL_SEQ="1!2@34$5%6^78*9(0qQwWeErtTyYuiIoOpPasSdDfgGhHjJklLzZxcCvVbBnm"
-  const FULL_BASE_MIDI=36
-
-  const heldNotes=new Set()
-  const downKeys=new Set()
-
-  function setOctaveShift(v){octaveShift=Math.max(-4,Math.min(4,v));octPill.textContent="oct "+String(octaveShift)}
-
-  function renderHint(){
-    kbdHint.innerHTML=""
-    if(schemeEl.value==="octave"){
-      const parts=["A","S","D","F","G","H","J","K","L",";","'","W","E","T","U","O","P","]","Z","X"]
-      for(const p of parts){const s=document.createElement("span");s.textContent=p;kbdHint.appendChild(s)}
-    }else{
-      const preview=FULL_SEQ.slice(0,40).split("")
-      for(const p of preview){const s=document.createElement("span");s.textContent=p;kbdHint.appendChild(s)}
-      const more=document.createElement("span");more.textContent="…";kbdHint.appendChild(more)
-    }
-  }
-
-  schemeEl.addEventListener("change",()=>{for(const n of Array.from(heldNotes)) localUp(n);downKeys.clear();renderHint()})
-  renderHint();setOctaveShift(0)
-
-  function keyToNote(key){
-    if(schemeEl.value==="octave"){
-      const k=String(key).toLowerCase()
-      let i=WHITE_KEYS.indexOf(k)
-      if(i!==-1) return BASE_MIDI+octaveShift*12+WHITE_OFFSETS[i]
-      i=BLACK_KEYS.indexOf(k)
-      if(i!==-1) return BASE_MIDI+octaveShift*12+BLACK_OFFSETS[i]
-      return null
-    }
-    const idx=FULL_SEQ.indexOf(String(key))
-    if(idx===-1) return null
-    return FULL_BASE_MIDI+idx
-  }
-
-  function localDown(note){
-    if(heldNotes.has(note)) return
-    heldNotes.add(note)
-    ensureAudio()
-    noteOn(note,0.9,document.getElementById("wave").value)
-    setKeyVisual(note,true)
-  }
-
-  function localUp(note){
-    if(!heldNotes.has(note)) return
-    heldNotes.delete(note)
-    noteOff(note)
-    setKeyVisual(note,false)
-  }
-
-  // Pointer input
-  let activePointerId=null
-  let activeNote=null
-
-  function noteFromTarget(t){
-    const el=t && t.closest ? t.closest(".white,.black") : null
-    if(!el) return null
-    return parseInt(el.dataset.note,10)
-  }
-
-  function pointerNoteAt(x,y){
-    const el=document.elementFromPoint(x,y)
-    return noteFromTarget(el)
-  }
-
-  piano.addEventListener("pointerdown",(e)=>{
-    piano.setPointerCapture(e.pointerId)
-    activePointerId=e.pointerId
-    const n=noteFromTarget(e.target)
-    if(n!=null){activeNote=n;localDown(n)}
-  })
-
-  piano.addEventListener("pointermove",(e)=>{
-    if(activePointerId!==e.pointerId) return
-    const n=pointerNoteAt(e.clientX,e.clientY)
-    if(n==null) return
-    if(activeNote==null){activeNote=n;localDown(n);return}
-    if(n!==activeNote){localUp(activeNote);activeNote=n;localDown(activeNote)}
-  })
-
-  function endPointer(e){
-    if(activePointerId!==e.pointerId) return
-    if(activeNote!=null) localUp(activeNote)
-    activePointerId=null
-    activeNote=null
-  }
-
-  piano.addEventListener("pointerup",endPointer)
-  piano.addEventListener("pointercancel",endPointer)
-
-  // Keyboard input
-  window.addEventListener("keydown",(e)=>{
-    if(schemeEl.value==="octave"){
-      if(e.key==="z"||e.key==="Z"){e.preventDefault();setOctaveShift(octaveShift-1);return}
-      if(e.key==="x"||e.key==="X"){e.preventDefault();setOctaveShift(octaveShift+1);return}
-    }
-
-    const note=keyToNote(e.key)
-    if(note==null) return
-
-    const keyId=schemeEl.value+":"+String(e.key)
-    if(downKeys.has(keyId)) return
-    downKeys.add(keyId)
-
-    e.preventDefault()
-    localDown(note)
-  })
-
-  window.addEventListener("keyup",(e)=>{
-    const note=keyToNote(e.key)
-    if(note==null) return
-
-    const keyId=schemeEl.value+":"+String(e.key)
-    if(!downKeys.has(keyId)) return
-    downKeys.delete(keyId)
-
-    e.preventDefault()
-    localUp(note)
-  })
-
-  window.addEventListener("blur",()=>{for(const n of Array.from(heldNotes)) localUp(n);downKeys.clear()})
+  // Mouse
+  Object.keys(elements).forEach(key => {
+    const el = elements[key];
+    el.addEventListener('mousedown', () => playNote(key));
+    el.addEventListener('mouseup', () => stopNote(key));
+    el.addEventListener('mouseleave', () => stopNote(key));
+  });
 </script>
 </body>
 </html>
