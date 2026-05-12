@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Piano</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="controls">
+  <div class="ctrl-group">
+    <label>Sound</label>
+    <select id="waveform">
+      <option value="triangle">Piano</option>
+      <option value="sine">Sine</option>
+      <option value="square">Square</option>
+      <option value="sawtooth">Sawtooth</option>
+    </select>
+  </div>
+  <div class="ctrl-group">
+    <label>Octave</label>
+    <div class="octave-btns">
+      <button id="octDown" title="Z">−</button>
+      <span id="octaveVal">4</span>
+      <button id="octUp" title="X">+</button>
+    </div>
+    <span class="hint">Z / X</span>
+  </div>
+  <div class="ctrl-group">
+    <label>Root</label>
+    <select id="scaleRoot">
+      <option value="-1">—</option>
+      <option value="0">C</option>
+      <option value="1">C#</option>
+      <option value="2">D</option>
+      <option value="3">D#</option>
+      <option value="4">E</option>
+      <option value="5">F</option>
+      <option value="6">F#</option>
+      <option value="7">G</option>
+      <option value="8">G#</option>
+      <option value="9">A</option>
+      <option value="10">A#</option>
+      <option value="11">B</option>
+    </select>
+    <label>Scale</label>
+    <select id="scaleType">
+      <option value="major">Major</option>
+      <option value="minor">Natural Minor</option>
+      <option value="harmonic">Harmonic Minor</option>
+      <option value="pent_maj">Pentatonic Maj</option>
+      <option value="pent_min">Pentatonic Min</option>
+      <option value="blues">Blues</option>
+      <option value="dorian">Dorian</option>
+      <option value="phrygian">Phrygian</option>
+      <option value="lydian">Lydian</option>
+      <option value="mixolydian">Mixolydian</option>
+      <option value="chromatic">Chromatic</option>
+    </select>
+  </div>
+</div>
+
+<div class="piano" id="piano"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+*, *::before, *::after { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    background: #1e1e1e;
+    font-family: sans-serif;
+  }
+
+  /* ── Controls ── */
+  .controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .ctrl-group {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: #2c2c2c;
+    border: 1px solid #444;
+    border-radius: 6px;
+    padding: 5px 10px;
+    color: #bbb;
+    font-size: 13px;
+  }
+  .ctrl-group label { color: #888; white-space: nowrap; }
+  select {
+    background: #3a3a3a;
+    color: #eee;
+    border: 1px solid #555;
+    border-radius: 4px;
+    padding: 3px 6px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .octave-btns { display: flex; gap: 4px; align-items: center; }
+  .octave-btns button {
+    background: #3a3a3a;
+    color: #eee;
+    border: 1px solid #555;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 14px;
+    cursor: pointer;
+    line-height: 1.4;
+  }
+  .octave-btns button:hover { background: #4a4a4a; }
+  #octaveVal { min-width: 18px; text-align: center; color: #eee; font-weight: bold; }
+  .hint { color: #555; font-size: 12px; }
+
+  /* ── Piano ── */
+  .piano {
+    position: relative;
+    display: flex;
+    background: #111;
+    padding: 12px 28px 12px 12px;
+    border-radius: 8px;
+    box-shadow: 0 8px 28px rgba(0,0,0,.6);
+  }
+  .white {
+    width: 56px;
+    height: 220px;
+    background: #f8f8f8;
+    border: 1px solid #999;
+    border-radius: 0 0 6px 6px;
+    margin: 0 1px;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    padding-bottom: 10px;
+    color: #666;
+    font-size: 13px;
+    cursor: pointer;
+    user-select: none;
+    transition: background .04s;
+    position: relative;
+  }
+  .white.active    { background: #aad4f5 !important; }
+  .white.in-scale  { background: #dff0d8; }
+  .white.root-key  { background: #b2dfdb; border-color: #26a69a; }
+
+  .black {
+    position: absolute;
+    width: 36px;
+    height: 132px;
+    background: #1a1a1a;
+    border-radius: 0 0 5px 5px;
+    color: #999;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    padding-bottom: 8px;
+    font-size: 11px;
+    cursor: pointer;
+    user-select: none;
+    z-index: 2;
+    top: 12px;
+    transition: background .04s;
+    border: 1px solid #333;
+    border-top: none;
+  }
+  .black.active    { background: #3a7bd5 !important; }
+  .black.in-scale  { background: #2e6b3e; }
+  .black.root-key  { background: #1a5e50; border-color: #26a69a; }
+
+  /* Legend dots on scale-highlighted keys */
+  .key-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-bottom: 4px;
+    flex-shrink: 0;
+  }
+  .white .key-dot { background: #26a69a; }
+  .white.root-key .key-dot { background: #00695c; }
+  .black .key-dot { background: #80cbc4; }
+  .black.root-key .key-dot { background: #b2dfdb; }

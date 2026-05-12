@@ -1,0 +1,119 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      background: #000;
+      color: #fff;
+      font-family: 'Inter', -apple-system, system-ui, sans-serif;
+      font-weight: 500;
+      -webkit-font-smoothing: antialiased;
+      user-select: none;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+      min-height: 100vh;
+      gap: 0;
+    }
+
+    #level-desc {
+      font-size: 21px;
+      font-weight: 500;
+      letter-spacing: -0.42px;
+      color: #adadad;
+      margin-bottom: 48px;
+    }
+
+    .tone-cards {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .tone-card {
+      flex: 1;
+      background: #111;
+      border: 1.5px solid #222;
+      border-radius: 20px;
+      padding: 32px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      transition: border-color 0.2s;
+      cursor: default;
+    }
+
+    .tone-card.playing {
+      border-color: rgba(255,255,255,0.5);
+    }
+
+    /* When answerable, card glows subtly on hover */
+    .tone-card.answerable {
+      cursor: pointer;
+    }
+    .tone-card.answerable:hover {
+      border-color: rgba(255,255,255,0.35);
+    }
+    .tone-card.answerable:active {
+      border-color: rgba(255,255,255,0.6);
+    }
+
+    .speaker-btn {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: #fff;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.15s ease, opacity 0.15s;
+      flex-shrink: 0;
+    }
+    .speaker-btn:hover { transform: scale(1.05); }
+    .speaker-btn:active { transform: scale(0.95); }
+    .speaker-btn:disabled { opacity: 0.3; cursor: default; transform: none; }
+    .speaker-btn svg { width: 24px; height: 24px; }
+
+    /* answerable state: speaker button pulses white slightly */
+    .tone-card.answerable .speaker-btn {
+      box-shadow: 0 0 0 0 rgba(255,255,255,0.15);
+    }
+
+    #play-both-btn {
+      margin-top: 20px;
+      height: 52px;
+      padding: 0 32px;
+      border-radius: 58px;
+      background: transparent;
+      border: 1.5px solid rgba(255,255,255,0.25);
+      color: #fff;
+      font-family: inherit;
+      font-weight: 500;
+      font-size: 15px;
+      letter-spacing: -0.3px;
+      cursor: pointer;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    #play-both-btn:hover { border-color: rgba(255,255,255,0.6); }
+    #play-both-btn:active { transform: scale(0.97); }
+    #play-both-btn:disabled { opacity: 0.25; cursor: default; transform: none; }
+
+    #feedback {
+      font-size: 16px;
+      font-weight: 500;
+      letter-spacing: -0.32px;
+      min-height: 24px;
+      margin-top: 32px;
+      color: rgba(255,255,255,0.45);
+      text-align: center;
+    }
+    #feedback.correct { color: #fff; }
+    #feedback.wrong   { color: rgba(255,255,255,0.45); }

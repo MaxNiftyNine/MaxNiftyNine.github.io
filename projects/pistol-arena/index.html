@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sector 02 - Pistol Arena</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="crosshair"></div>
+<canvas id="reload-ring" width="64" height="64"></canvas>
+<div id="timer">5:00</div>
+<div id="scoreboard"></div>
+<div id="death-overlay"><div id="death-title">ELIMINATED</div><span id="respawn-timer" style="font-size:16px"></span></div>
+<div id="intermission-overlay"><span id="intermission-title" style="font-size:28px;font-weight:bold">ROUND OVER</span><br><span id="intermission-timer" style="font-size:16px"></span></div>
+<div id="killfeed"></div>
+<div id="kill-toast"></div>
+
+
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }</script>
+<script type="module" src="app.js"></script>
+</body>
+</html>

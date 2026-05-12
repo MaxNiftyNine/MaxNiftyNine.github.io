@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pitch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<h1>Pick the higher sound</h1>
+<div id="level-desc">1 octave apart</div>
+
+<div class="tone-cards">
+  <div class="tone-card" id="card-a">
+    <button class="speaker-btn" id="play-a" title="Play A">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round">
+        <line x1="8" y1="5" x2="8" y2="14"/>
+        <line x1="10" y1="14" x2="15" y2="14"/>
+        <line x1="16" y1="14" x2="16" y2="19"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="tone-card" id="card-b">
+    <button class="speaker-btn" id="play-b" title="Play B">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round">
+        <line x1="16" y1="5" x2="16" y2="14"/>
+        <line x1="10" y1="14" x2="15" y2="14"/>
+        <line x1="8" y1="14" x2="8" y2="19"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<button id="play-both-btn">Play both</button>
+
+<div id="feedback"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
